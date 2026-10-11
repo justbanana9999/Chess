@@ -1,0 +1,32 @@
+body {
+    background-color: #4C4541;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(8,80px);
+    grid-template-rows: repeat(8,80px);
+    width: 640px;
+    height: 640px;
+    border: 4px solid #333;
+}
+
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+    cursor: pointer;
+}
+
+.light { background-color: #f0d9b5; }
+.dark { background-color: #b58863; }
+
+.square.selected { background-color: darksalmon !important; }
+
+.chess-piece {
+    width: 95%;
+    height: 95%;
+    object-fit: contain;
+    pointer-events: none;
+}
