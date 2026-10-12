@@ -266,82 +266,6 @@ function updateTurn() {
     whiteTurn = !whiteTurn;
 }
 
-let selectedSquare = null;
-
-boardElement.addEventListener('click', (event) => {
-    const squareElement = event.target.closest('.square');
-    if (!squareElement) return;
-
-    const row = parseInt(squareElement.dataset.row);
-    const col = parseInt(squareElement.dataset.col);
-    const clickedPiece = initialBoard[row][col];
-
-    if (!selectedSquare) {
-        if (clickedPiece !== null) {
-            if (checkWhite(clickedPiece) !== whiteTurn) {
-                return;
-            }
-            selectedSquare = {row,col};
-
-            squareElement.classList.add('selected');
-
-            highlightValidMoves(row,col);
-        }
-        return;
-    }
-
-    const startRow = selectedSquare.row;
-    const startCol = selectedSquare.col;
-
-    if (startRow === row && startCol == col) {
-        clearSelection();
-        return;
-    }
-
-    if (clickedPiece !== null && checkWhite(clickedPiece) == whiteTurn) {
-        clearSelection();
-        selectedSquare = {row,col};
-        squareElement.classList.add('selected');
-        highlightValidMoves(row,col);
-        return
-    }
-    
-    const piece = initialBoard[startRow][startCol];
-
-    let isValid = false;
-
-    isValid = isMoveValidForPiece(startRow,startCol,row,col,piece)
-    
-    if (!isValid) {
-        clearSelection();
-        return;
-    }
-
-    const targetPiece = initialBoard[row][col];
-    initialBoard[row][col] = piece;
-    initialBoard[startRow][startCol] = null;
-
-    const movingPlayerIsWhite = whiteTurn;
-    if (isKingInCheck(movingPlayerIsWhite)) {
-        initialBoard[startRow][startCol] = piece;
-        initialBoard[row][col] = targetPiece;
-
-        clearSelection();
-        return;
-        
-    }
-    
-    clearSelection();
-    updateTurn();
-    renderBoard();
-
-    const nextPlayerIsWhite = whiteTurn;
-    if (isCheckmate(nextPlayerIsWhite)) {
-        alert(`Checkmate, ${nextPlayerIsWhite ? 'Black' : 'White'} wins!`)
-    }
-
-})
-
 function clearSelection() {
     selectedSquare = null;
 
@@ -405,3 +329,96 @@ function highlightValidMoves (startRow,startCol) {
         }
     }
 }
+
+let selectedSquare = null;
+
+body = document.querySelector('body')
+
+boardElement.addEventListener('click', (event) => {
+    const squareElement = event.target.closest('.square');
+    if (!squareElement) return;
+
+    const row = parseInt(squareElement.dataset.row);
+    const col = parseInt(squareElement.dataset.col);
+    const clickedPiece = initialBoard[row][col];
+
+    if (!selectedSquare) {
+        if (clickedPiece !== null) {
+            if (checkWhite(clickedPiece) !== whiteTurn) {
+                return;
+            }
+            selectedSquare = {row,col};
+
+            squareElement.classList.add('selected');
+
+            highlightValidMoves(row,col);
+
+            // const stick = document.createElement('div');
+
+            // stick.id.add('stick');
+
+            stick.src = pieceImages[clickedPiece]
+
+            body.appendChild(stick)
+
+            // alert('child appended')
+        }
+        return;
+    }
+
+    const startRow = selectedSquare.row;
+    const startCol = selectedSquare.col;
+
+    if (startRow === row && startCol == col) {
+        clearSelection();
+        return;
+    }
+
+    if (clickedPiece !== null && checkWhite(clickedPiece) == whiteTurn) {
+        clearSelection();
+        selectedSquare = {row,col};
+        squareElement.classList.add('selected');
+        highlightValidMoves(row,col);
+        return
+    }
+    
+    const piece = initialBoard[startRow][startCol];
+
+    let isValid = false;
+
+    isValid = isMoveValidForPiece(startRow,startCol,row,col,piece)
+    
+    if (!isValid) {
+        clearSelection();
+        return;
+    }
+
+    const targetPiece = initialBoard[row][col];
+    initialBoard[row][col] = piece;
+    initialBoard[startRow][startCol] = null;
+
+    const movingPlayerIsWhite = whiteTurn;
+    if (isKingInCheck(movingPlayerIsWhite)) {
+        initialBoard[startRow][startCol] = piece;
+        initialBoard[row][col] = targetPiece;
+
+        clearSelection();
+        return;
+        
+    }
+    
+    clearSelection();
+    updateTurn();
+    renderBoard();
+
+    const nextPlayerIsWhite = whiteTurn;
+    if (isCheckmate(nextPlayerIsWhite)) {
+        alert(`Checkmate, ${nextPlayerIsWhite ? 'Black' : 'White'} wins!`)
+    }
+
+})
+
+boardElement.addEventListener('mousemove', (event) => {
+    // alert('move')
+    document.getElementById('stick').style.transform = `translate(calc(${event.clientX}px-50%),calc(${event.clientY}px-50%))`
+})

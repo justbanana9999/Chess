@@ -62,3 +62,22 @@ body {
     object-fit: contain;
     pointer-events: none;
 }
+
+#stick {
+    width: 80px;
+    height: 80px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+
+    transform: translate(-50%,-50%);
+
+    transition: transform 0.1s cubic-bezier(0.25,1,0.5,1);
+
+    src:'pieces/Bishop Black Wood Outline.svg'
+}
+
+.hidden {
+    background-size: 0 0;
+}
