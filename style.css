@@ -4,14 +4,25 @@ body {
 
 #board {
     display: grid;
-    grid-template-columns: repeat(8,80px);
-    grid-template-rows: repeat(8,80px);
+    grid-template-columns: repeat(8,1fr);
+    grid-template-rows: repeat(8,1fr);
     width: 640px;
     height: 640px;
-    border: 4px solid #333;
+    /* border: 4px solid #333; */
+
+    background-image: url('Board Green.svg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
 
+/* img {
+    width: 640px;
+    height: 640px;
+} */
+
 .square {
+    background-color: transparent !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,8 +30,9 @@ body {
     cursor: pointer;
 }
 
-.light { background-color: #f0d9b5; }
-.dark { background-color: #b58863; }
+/* .light { background-color: #f0d9b5; } */
+
+/* .dark { background-color: #b58863; } */
 
 .square.selected { background-color: darksalmon !important; }
 
