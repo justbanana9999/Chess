@@ -273,6 +273,12 @@ function clearSelection() {
         sq.classList.remove('selected');
         sq.classList.remove('valid-move');
         sq.classList.remove('attack-move');
+
+        const pieceImg = sq.querySelector('.chess-piece');
+        if (pieceImg) {
+            pieceImg.classList.remove('hidden');
+        }
+        stick.classList.add('hidden')
     });
 }
 
@@ -343,8 +349,6 @@ boardElement.addEventListener('click', (event) => {
     const col = parseInt(squareElement.dataset.col);
     const clickedPiece = initialBoard[row][col];
 
-    stick.classList.add('hidden')
-
     if (!selectedSquare) {
         if (clickedPiece !== null) {
             if (checkWhite(clickedPiece) !== whiteTurn) {
@@ -358,7 +362,14 @@ boardElement.addEventListener('click', (event) => {
 
             stick.src = pieceImages[clickedPiece];
             stick.classList.remove('hidden');
-            squareElement.classList.add('hidden');
+
+            const pieceImg = squareElement.querySelector('.chess-piece');
+
+            if (pieceImg) {
+                pieceImg.classList.add('hidden');
+            }
+            
+            // squareElement.classList.add('hidden');
         }
 
         return;
