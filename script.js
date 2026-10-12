@@ -129,9 +129,13 @@ function isValidKingMove(startRow,startCol,targetRow,targetCol) {
     
 }
 
+function checkWhite(piece) {
+    return piece !== piece.toUpperCase();
+}
+
 function sameColor(piece,targetPiece) {
-    const isWhite = piece === piece.toUpperCase();
-    const isTargetWhite = targetPiece === targetPiece.toUpperCase();
+    const isWhite = checkWhite(piece);
+    const isTargetWhite = checkWhite(targetPiece);
 
     return isWhite === isTargetWhite;
 }
@@ -159,6 +163,12 @@ const boardElement = document.getElementById('board');
 
 renderBoard();
 
+const whiteTurn = true;
+
+function updateTurn() {
+    whiteTurn = !whiteTurn;
+}
+
 let selectedSquare = null;
 
 boardElement.addEventListener('click', (event) => {
@@ -171,6 +181,9 @@ boardElement.addEventListener('click', (event) => {
 
     if (!selectedSquare) {
         if (clickedPiece !== null) {
+            if (checkWhite(clickedPiece) === true) {
+                return;
+            }
             selectedSquare = {row,col};
 
             squareElement.classList.add('selected');
