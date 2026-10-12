@@ -63,7 +63,7 @@ body {
     pointer-events: none;
 }
 
-#stick {
+.stick {
     width: 80px;
     height: 80px;
     position: fixed;
@@ -73,11 +73,11 @@ body {
 
     transform: translate(-50%,-50%);
 
-    transition: transform 0.1s cubic-bezier(0.25,1,0.5,1);
+    /* transition: transform 0.1s cubic-bezier(0.25,1,0.5,1); */
 
-    src:'pieces/Bishop Black Wood Outline.svg'
+    /* src:'pieces/Pawn White Wood Outline.svg' */
 }
 
 .hidden {
-    background-size: 0 0;
+    display: none;
 }

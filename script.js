@@ -332,7 +332,8 @@ function highlightValidMoves (startRow,startCol) {
 
 let selectedSquare = null;
 
-body = document.querySelector('body')
+const body = document.querySelector('body')
+const stick = document.querySelector('.stick');
 
 boardElement.addEventListener('click', (event) => {
     const squareElement = event.target.closest('.square');
@@ -341,6 +342,8 @@ boardElement.addEventListener('click', (event) => {
     const row = parseInt(squareElement.dataset.row);
     const col = parseInt(squareElement.dataset.col);
     const clickedPiece = initialBoard[row][col];
+
+    stick.classList.add('hidden')
 
     if (!selectedSquare) {
         if (clickedPiece !== null) {
@@ -353,16 +356,11 @@ boardElement.addEventListener('click', (event) => {
 
             highlightValidMoves(row,col);
 
-            // const stick = document.createElement('div');
-
-            // stick.id.add('stick');
-
-            stick.src = pieceImages[clickedPiece]
-
-            body.appendChild(stick)
-
-            // alert('child appended')
+            stick.src = pieceImages[clickedPiece];
+            stick.classList.remove('hidden');
+            squareElement.classList.add('hidden');
         }
+
         return;
     }
 
@@ -371,6 +369,7 @@ boardElement.addEventListener('click', (event) => {
 
     if (startRow === row && startCol == col) {
         clearSelection();
+        squareElement.classList.remove('hidden');
         return;
     }
 
@@ -379,7 +378,11 @@ boardElement.addEventListener('click', (event) => {
         selectedSquare = {row,col};
         squareElement.classList.add('selected');
         highlightValidMoves(row,col);
-        return
+
+        stick.src = pieceImages[clickedPiece];
+        stick.classList.remove('hidden');
+
+        return;
     }
     
     const piece = initialBoard[startRow][startCol];
@@ -418,7 +421,10 @@ boardElement.addEventListener('click', (event) => {
 
 })
 
-boardElement.addEventListener('mousemove', (event) => {
-    // alert('move')
-    document.getElementById('stick').style.transform = `translate(calc(${event.clientX}px-50%),calc(${event.clientY}px-50%))`
+window.addEventListener('mousemove', (event) => {
+    try{
+        stick.style.transform = `translate(calc(${event.clientX}px - 50%),calc(${event.clientY}px - 50%))`
+    } catch (e) {
+        alert(e)
+    }
 })
