@@ -1,13 +1,25 @@
+:root {
+    --board-size: 90vh;
+    --tile-size: calc(var(--board-size)/8);
+}
+
 body {
     background-color: #4C4541;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
 #board {
     display: grid;
     grid-template-columns: repeat(8,1fr);
     grid-template-rows: repeat(8,1fr);
-    width: 640px;
-    height: 640px;
+    width: var(--board-size);
+    height: var(--board-size);
     /* border: 4px solid #333; */
 
     background-image: url('Board Green.svg');
@@ -27,7 +39,6 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 50px;
-    cursor: pointer;
 }
 
 /* .light { background-color: #f0d9b5; } */
@@ -39,8 +50,8 @@ body {
 .square.valid-move::after {
     content: '';
     position: absolute;
-    width: 25px;
-    height: 25px;
+    width: calc(var(--tile-size)/3);
+    height: calc(var(--tile-size)/3);
     background-color: rgba(0,0,0,0.15);
     border-radius: 50%;
 }
@@ -49,8 +60,8 @@ body {
     box-sizing: border-box;
     content: '';
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: var(--tile-size);
+    height: var(--tile-size);
     background-color: rgba(0,0,0,0);
     border: 7.5px solid rgba(0,0,0,0.15);
     border-radius: 50%;
@@ -61,23 +72,44 @@ body {
     height: 95%;
     object-fit: contain;
     pointer-events: none;
+
+}
+
+.square:has(.chess-piece) {
+    cursor: pointer;
 }
 
 .stick {
-    width: 80px;
-    height: 80px;
+    width: var(--tile-size);
+    height: var(--tile-size);
     position: fixed;
     top: 0;
     left: 0;
     pointer-events: none;
-
-    transform: translate(-50%,-50%);
 
     /* transition: transform 0.1s cubic-bezier(0.25,1,0.5,1); */
 
     /* src:'pieces/Pawn White Wood Outline.svg' */
 }
 
+.shadow {
+    width: var(--tile-size);
+    height: var(--tile-size);
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    pointer-events: none;
+
+    filter: brightness(0) blur(2px);
+
+    opacity: 0.4;
+}
+
 .hidden {
     display: none;
+}
+
+body.is-grabbing, body.is-grabbing * {
+    cursor: grabbing !important;
 }

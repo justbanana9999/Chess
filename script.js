@@ -269,6 +269,8 @@ function updateTurn() {
 function clearSelection() {
     selectedSquare = null;
 
+    document.body.style.cursor = 'default';
+    
     document.querySelectorAll('.square').forEach(sq => {
         sq.classList.remove('selected');
         sq.classList.remove('valid-move');
@@ -278,7 +280,7 @@ function clearSelection() {
         if (pieceImg) {
             pieceImg.classList.remove('hidden');
         }
-        stick.classList.add('hidden')
+        hideStick();
     });
 }
 
@@ -336,10 +338,30 @@ function highlightValidMoves (startRow,startCol) {
     }
 }
 
+function showStick(clickedPiece) {
+    stick.classList.remove('hidden');
+    stick.src = pieceImages[clickedPiece];
+    shadow.classList.remove('hidden');
+    shadow.src = pieceImages[clickedPiece];
+    // document.querySelector('.stick').forEach(el => {
+    //     el.src = pieceImages[clickedPiece];
+    //     el.classList.remove('hidden');
+    // })
+}
+
+function hideStick() {
+    stick.classList.add('hidden');
+    shadow.classList.add('hidden');
+    // document.querySelectorAll('.stick').forEach(el => {
+    //     el.classList.add('hidden');
+    // })
+}
+
 let selectedSquare = null;
 
 const body = document.querySelector('body')
 const stick = document.querySelector('.stick');
+const shadow = document.querySelector('.shadow');
 
 boardElement.addEventListener('click', (event) => {
     const squareElement = event.target.closest('.square');
@@ -348,6 +370,8 @@ boardElement.addEventListener('click', (event) => {
     const row = parseInt(squareElement.dataset.row);
     const col = parseInt(squareElement.dataset.col);
     const clickedPiece = initialBoard[row][col];
+
+    document.body.classList.remove('is-grabbing');
 
     if (!selectedSquare) {
         if (clickedPiece !== null) {
@@ -361,8 +385,10 @@ boardElement.addEventListener('click', (event) => {
             highlightValidMoves(row,col);
 
             stick.src = pieceImages[clickedPiece];
-            stick.classList.remove('hidden');
+            showStick(clickedPiece);
 
+            document.body.classList.add('is-grabbing');
+            
             const pieceImg = squareElement.querySelector('.chess-piece');
 
             if (pieceImg) {
@@ -386,12 +412,15 @@ boardElement.addEventListener('click', (event) => {
 
     if (clickedPiece !== null && checkWhite(clickedPiece) == whiteTurn) {
         clearSelection();
-        selectedSquare = {row,col};
-        squareElement.classList.add('selected');
-        highlightValidMoves(row,col);
+        
+        // selectedSquare = {row,col};
+        // squareElement.classList.add('selected');
+        // highlightValidMoves(row,col);
 
-        stick.src = pieceImages[clickedPiece];
-        stick.classList.remove('hidden');
+        // stick.src = pieceImages[clickedPiece];
+        // showStick(clickedPiece);
+
+        // document.body.classList.add('is-grabbing');
 
         return;
     }
@@ -432,10 +461,51 @@ boardElement.addEventListener('click', (event) => {
 
 })
 
-window.addEventListener('mousemove', (event) => {
+function getNearestValidMove(mouseX,mouseY) {
+    const validSquares = document.querySelectorAll('.square.valid-move,.square.attack-move');
+
+    let nearestSquare = null;
+    let minDistance = Infinity;
+
+    validSquares.forEach(square => {
+        const rect = square.getBoundingClientRect();
+
+        const squareCenterX = rect.left+rect.width/2
+        const squareCenterY = rect.top+rect.height/2
+
+        const distance = Math.hypot(squareCenterX-mouseX,squareCenterY-mouseY);
+
+        if (distance<minDistance) {
+            minDistance = distance;
+            nearestSquare = square;
+        }
+    });
+
+    return minDistance;
+}
+
+const computedStyle = getComputedStyle(document.documentElement);
+
+function handleCursorMove() {
     try{
+        const boardRect = boardElement.getBoundingClientRect();
+        const tileSize = boardRect.width/8;
+
+        let dist = getNearestValidMove(event.clientX,event.clientY);
+        if (dist === Infinity) {
+            dist = 1
+        }
+        const blur = Math.max((dist+9*tileSize)/(tileSize)*5-49,1)*tileSize/50;
+        shadow.style.filter = `brightness(0) blur(${blur}px)`
+        shadow.style.opacity = Math.min((0.4-(dist)/(tileSize*10))+0.1,0.4)
+        const offset = Math.max((dist+9*tileSize)/tileSize-9,1)*tileSize/10;
+        // const offset = 50;
         stick.style.transform = `translate(calc(${event.clientX}px - 50%),calc(${event.clientY}px - 50%))`
+        shadow.style.transform = `translate(calc(${event.clientX}px - 50% + ${offset}px),calc(${event.clientY}px - 50% + ${offset}px))`
     } catch (e) {
         alert(e)
     }
-})
+}
+
+window.addEventListener('mousemove',handleCursorMove);
+window.addEventListener('click',handleCursorMove);
