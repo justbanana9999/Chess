@@ -130,7 +130,7 @@ function isValidKingMove(startRow,startCol,targetRow,targetCol) {
 }
 
 function checkWhite(piece) {
-    return piece !== piece.toUpperCase();
+    return piece === piece.toUpperCase();
 }
 
 function sameColor(piece,targetPiece) {
@@ -181,7 +181,7 @@ boardElement.addEventListener('click', (event) => {
 
     if (!selectedSquare) {
         if (clickedPiece !== null) {
-            if (checkWhite(clickedPiece) === true) {
+            if (checkWhite(clickedPiece) === false) {
                 return;
             }
             selectedSquare = {row,col};
@@ -225,8 +225,11 @@ boardElement.addEventListener('click', (event) => {
     initialBoard[row][col] = initialBoard[startRow][startCol];
     initialBoard[startRow][startCol] = null;
 
+    
     clearSelection();
-
+    
+    updateTurn();
+    
     renderBoard();
 
 })
