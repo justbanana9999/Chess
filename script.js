@@ -159,11 +159,108 @@ function checkStep(startRow,startCol,targetRow,targetCol) {
 
 }
 
+function findKing(isWhiteKing) {
+    const kingChar = isWhiteKing ? 'K' : 'k';
+    for (let row=0;row<8;row++) {
+        for (let col=0;col<8;col++) {
+            if (initialBoard[row][col] === kingChar) {
+                return {row,col};
+            }
+        }
+    }
+
+    return null;
+
+}
+
+function isKingInCheck(isWhiteKing) {
+    const kingPos = findKing(isWhiteKing);
+    if (!kingPos) return false;
+
+    for (let row=0;row<8;row++) {
+        for (let col=0;col<8;col++) {
+            const piece = initialBoard[row][col];
+            if (piece === null) continue;
+
+            const pieceIsWhite = checkWhite(piece);
+            if (pieceIsWhite !== isWhiteKing) {
+                let canAttack = false;
+                const upperPiece = piece.toUpperCase();
+
+                if (upperPiece === 'N') canAttack = isValidKnightMove(row,col,kingPos.row,kingPos.col);
+                else if (upperPiece === 'P') canAttack = isValidPawnMove(row,col,kingPos.row,kingPos.col);
+                else if (upperPiece === 'R') canAttack = isValidRookMove(row,col,kingPos.row,kingPos.col);
+                else if (upperPiece === 'B') canAttack = isValidBishopMove(row,col,kingPos.row,kingPos.col);
+                else if (upperPiece === 'Q') canAttack = isValidQueenMove(row,col,kingPos.row,kingPos.col);
+                else if (upperPiece === 'K') canAttack = isValidKingMove(row,col,kingPos.row,kingPos.col);
+                
+                if (canAttack) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+function isCheckmate(isWhitePlayer) {
+    if (!isKingInCheck(isWhitePlayer)) {
+        return false;
+    }
+
+    for (let startRow=0;startRow<8;startRow++) {
+        for (let startCol=0;startCol<8;startCol++) {
+            const piece = initialBoard[startRow][startCol];
+
+            if (piece === null) continue;
+
+            if (checkWhite(piece) !== isWhitePlayer) continue;
+
+            for (let targetRow=0;targetRow<8;targetRow++) {
+                for (let targetCol=0;targetCol<8;targetCol++) {
+                    if (startRow === targetRow && startCol === targetCol) continue;
+
+                    if (isMoveValidForPiece(startRow,startCol,targetRow,targetCol,piece)) {
+                        const targetPiece = initialBoard[targetRow][targetCol];
+                        initialBoard[targetRow][targetCol] = piece;
+                        initialBoard[startRow][startCol] = null;
+
+                        const stillInCheck = isKingInCheck(isWhitePlayer);
+
+                        initialBoard[startRow][startCol] = piece;
+                        initialBoard[targetRow][targetCol] = targetPiece;
+
+                        if (!stillInCheck) {
+                            return false;
+                        }
+                    }
+                }
+            
+            }
+        }
+    }
+
+    return true;
+}
+
+function isMoveValidForPiece(startRow,startCol,targetRow,targetCol,piece) {
+    const upperPiece = piece.toUpperCase();
+    if (upperPiece === 'N') return isValidKnightMove(startRow,startCol,targetRow,targetCol);
+    if (upperPiece === 'P') return isValidPawnMove(startRow,startCol,targetRow,targetCol);
+    if (upperPiece === 'R') return isValidRookMove(startRow,startCol,targetRow,targetCol);
+    if (upperPiece === 'B') return isValidBishopMove(startRow,startCol,targetRow,targetCol);
+    if (upperPiece === 'Q') return isValidQueenMove(startRow,startCol,targetRow,targetCol);
+    if (upperPiece === 'K') return isValidKingMove(startRow,startCol,targetRow,targetCol);
+    return false;
+
+}
+
 const boardElement = document.getElementById('board');
 
 renderBoard();
 
-const whiteTurn = true;
+let whiteTurn = true;
 
 function updateTurn() {
     whiteTurn = !whiteTurn;
@@ -181,12 +278,14 @@ boardElement.addEventListener('click', (event) => {
 
     if (!selectedSquare) {
         if (clickedPiece !== null) {
-            if (checkWhite(clickedPiece) === false) {
+            if (checkWhite(clickedPiece) !== whiteTurn) {
                 return;
             }
             selectedSquare = {row,col};
 
             squareElement.classList.add('selected');
+
+            highlightValidMoves(row,col);
         }
         return;
     }
@@ -198,46 +297,59 @@ boardElement.addEventListener('click', (event) => {
         clearSelection();
         return;
     }
+
+    if (clickedPiece !== null && checkWhite(clickedPiece) == whiteTurn) {
+        clearSelection();
+        selectedSquare = {row,col};
+        squareElement.classList.add('selected');
+        highlightValidMoves(row,col);
+        return
+    }
     
     const piece = initialBoard[startRow][startCol];
 
     let isValid = false;
-    
-    if (piece.toUpperCase() === 'N') {
-        isValid = isValidKnightMove(startRow,startCol,row,col);
-    } else if (piece.toUpperCase() === 'P') {
-        isValid = isValidPawnMove(startRow,startCol,row,col);
-    } else if (piece.toUpperCase() === 'R') {
-        isValid = isValidRookMove(startRow,startCol,row,col);
-    } else if (piece.toUpperCase() === 'B') {
-        isValid = isValidBishopMove(startRow,startCol,row,col);
-    } else if (piece.toUpperCase() === 'Q') {
-        isValid = isValidQueenMove(startRow,startCol,row,col);
-    } else if (piece.toUpperCase() === 'K') {
-        isValid = isValidKingMove(startRow,startCol,row,col);
-    }
 
+    isValid = isMoveValidForPiece(startRow,startCol,row,col,piece)
+    
     if (!isValid) {
         clearSelection();
         return;
     }
 
-    initialBoard[row][col] = initialBoard[startRow][startCol];
+    const targetPiece = initialBoard[row][col];
+    initialBoard[row][col] = piece;
     initialBoard[startRow][startCol] = null;
 
+    const movingPlayerIsWhite = whiteTurn;
+    if (isKingInCheck(movingPlayerIsWhite)) {
+        initialBoard[startRow][startCol] = piece;
+        initialBoard[row][col] = targetPiece;
+
+        clearSelection();
+        return;
+        
+    }
     
     clearSelection();
-    
     updateTurn();
-    
     renderBoard();
+
+    const nextPlayerIsWhite = whiteTurn;
+    if (isCheckmate(nextPlayerIsWhite)) {
+        alert(`Checkmate, ${nextPlayerIsWhite ? 'Black' : 'White'} wins!`)
+    }
 
 })
 
 function clearSelection() {
     selectedSquare = null;
 
-    document.querySelectorAll('.square').forEach(sq => sq.classList.remove('selected'));
+    document.querySelectorAll('.square').forEach(sq => {
+        sq.classList.remove('selected');
+        sq.classList.remove('valid-move');
+        sq.classList.remove('attack-move');
+    });
 }
 
 function renderBoard() {
@@ -266,6 +378,34 @@ function renderBoard() {
 
             boardElement.appendChild(square);
 
+        }
+    }
+}
+
+function highlightValidMoves (startRow,startCol) {
+    const piece = initialBoard[startRow][startCol];
+
+    for (let r=0;r<8;r++) {
+        for (let c=0;c<8;c++) {
+            if (isMoveValidForPiece(startRow,startCol,r,c,piece)) {
+                const targetPiece = initialBoard[r][c];
+                initialBoard[r][c] = piece;
+                initialBoard[startRow][startCol] = null;
+
+                const leavesInCheck = isKingInCheck(checkWhite(piece));
+
+                initialBoard[startRow][startCol] = piece;
+                initialBoard[r][c] = targetPiece;
+
+                if (!leavesInCheck) {
+                    const squareElement = document.querySelector(`.square[data-row='${r}'][data-col='${c}']`)
+                    if (squareElement) {
+                        if (initialBoard[r][c] === null) squareElement.classList.add('valid-move');
+                        else squareElement.classList.add('attack-move');
+                    }
+                }
+
+            }
         }
     }
 }

@@ -24,6 +24,26 @@ body {
 
 .square.selected { background-color: darksalmon !important; }
 
+.square.valid-move::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-color: rgba(0,0,0,0.15);
+    border-radius: 50%;
+}
+
+.square.attack-move::after {
+    box-sizing: border-box;
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-color: rgba(0,0,0,0);
+    border: 7.5px solid rgba(0,0,0,0.15);
+    border-radius: 50%;
+}
+
 .chess-piece {
     width: 95%;
     height: 95%;
