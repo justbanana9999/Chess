@@ -456,10 +456,28 @@ boardElement.addEventListener('click', (event) => {
 
     const nextPlayerIsWhite = whiteTurn;
     if (isCheckmate(nextPlayerIsWhite)) {
-        alert(`Checkmate, ${nextPlayerIsWhite ? 'Black' : 'White'} wins!`)
+        // alert(`Checkmate, ${nextPlayerIsWhite ? 'Black' : 'White'} wins!`)
+        checkmate(!whiteTurn);
     }
 
 })
+
+function checkmate(whiteWinner) {
+    try {
+        banner(`${whiteWinner ? 'White' : 'Black'} wins`)
+
+    }   catch(e) {
+        alert(e)
+    }
+
+}
+
+function banner(text) {
+    const b = document.createElement('div');
+    b.classList.add('banner');
+    b.innerHTML = text
+    body.appendChild(b);
+}
 
 function getNearestValidMove(mouseX,mouseY) {
     const validSquares = document.querySelectorAll('.square.valid-move,.square.attack-move,.selected');

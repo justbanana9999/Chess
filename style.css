@@ -12,6 +12,8 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+
+    font-family: "Google Sans", sans-serif;
 }
 
 #board {
@@ -116,4 +118,9 @@ body.is-grabbing, body.is-grabbing * {
 
 .banner {
     text-align: center;
+    position: fixed;
+    font-weight: bold;
+    font-size: min(20vw,20vh);
+    line-height: min(20vw,20vh);
+    width: min(90vw,90vh);
 }
