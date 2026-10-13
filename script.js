@@ -1,3 +1,5 @@
+// Board is populated with pieces.
+
 const initialBoard = [
     ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
     ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
@@ -8,6 +10,8 @@ const initialBoard = [
     ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
     ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 ];
+
+// Piece data on the tile point to their respective image.
 
 const pieceImages = {
     'P': 'pieces/Pawn White Wood Outline.svg',
@@ -23,6 +27,8 @@ const pieceImages = {
     'q': 'pieces/Queen Black Wood Outline.svg',
     'k': 'pieces/King Black Wood Outline.svg',
 };
+
+// All isValid xxx Move-functions check if the target tile is reachable by a piece.
 
 function isValidPawnMove(startRow,startCol,targetRow,targetCol) {
     const piece = initialBoard[startRow][startCol];
@@ -129,9 +135,13 @@ function isValidKingMove(startRow,startCol,targetRow,targetCol) {
     
 }
 
+// If a piece is white
+
 function checkWhite(piece) {
     return piece === piece.toUpperCase();
 }
+
+// If two pieces are the same color
 
 function sameColor(piece,targetPiece) {
     const isWhite = checkWhite(piece);
@@ -139,6 +149,8 @@ function sameColor(piece,targetPiece) {
 
     return isWhite === isTargetWhite;
 }
+
+// Moves a piece to a destination tile, tile by tile, and returns false if there are any pieces between. Used by the rook, bishop and queen.
 
 function checkStep(startRow,startCol,targetRow,targetCol) {
     const rowStep = startRow === targetRow ? 0 : (targetRow>startRow ? 1 : -1);
@@ -159,6 +171,8 @@ function checkStep(startRow,startCol,targetRow,targetCol) {
 
 }
 
+// Finds the position of the king of black or white.
+
 function findKing(isWhiteKing) {
     const kingChar = isWhiteKing ? 'K' : 'k';
     for (let row=0;row<8;row++) {
@@ -172,6 +186,8 @@ function findKing(isWhiteKing) {
     return null;
 
 }
+
+// Checks the entire board for possible enemy moves, and returns true if any of the moves hit the king tile.
 
 function isKingInCheck(isWhiteKing) {
     const kingPos = findKing(isWhiteKing);
@@ -203,6 +219,10 @@ function isKingInCheck(isWhiteKing) {
 
     return false;
 }
+
+// First iterates through the board for any pieces checking the opposite king's color,
+// then iterates again to check if any of the checked king's pieces (including the king) can move to a tile where the king isn't checked anymore.
+// If there aren't, then true is returned.
 
 function isCheckmate(isWhitePlayer) {
     if (!isKingInCheck(isWhitePlayer)) {
@@ -244,6 +264,8 @@ function isCheckmate(isWhitePlayer) {
     return true;
 }
 
+// COllected function of all isValid xxx Move-functions, that uses each function for its respective piece.
+
 function isMoveValidForPiece(startRow,startCol,targetRow,targetCol,piece) {
     const upperPiece = piece.toUpperCase();
     if (upperPiece === 'N') return isValidKnightMove(startRow,startCol,targetRow,targetCol);
@@ -256,15 +278,25 @@ function isMoveValidForPiece(startRow,startCol,targetRow,targetCol,piece) {
 
 }
 
+// Gets the board element, for when manipulating and reading its contents is required. 
+
 const boardElement = document.getElementById('board');
+
+// Initial render.
 
 renderBoard();
 
+// White begins.
+
 let whiteTurn = true;
+
+// whiteTurn = true --> whiteTurn = false
 
 function updateTurn() {
     whiteTurn = !whiteTurn;
 }
+
+// Removes all tile decorations, for when no piece is grabbed.
 
 function clearSelection() {
     selectedSquare = null;
@@ -284,6 +316,8 @@ function clearSelection() {
     });
 }
 
+// Updates the board's tiles' decorations and pieces.
+
 function renderBoard() {
     boardElement.innerHTML = ''
 
@@ -298,6 +332,9 @@ function renderBoard() {
                 img.src = pieceImages[piece];
                 img.alt = piece;
                 img.classList.add('chess-piece');
+                if (img.toUpperCase() == 'R' || img.toUpperCase() == 'K') {
+                    img.classList.add('unmoved');
+                }
                 square.appendChild(img);
             }
 
@@ -310,7 +347,9 @@ function renderBoard() {
     }
 }
 
-function highlightValidMoves (startRow,startCol) {
+// Highlights all valid moves for the grabbed piece.
+
+function highlightValidMoves(startRow,startCol) {
     const piece = initialBoard[startRow][startCol];
 
     for (let r=0;r<8;r++) {
@@ -338,6 +377,8 @@ function highlightValidMoves (startRow,startCol) {
     }
 }
 
+// Stick refers to the grabbed piece's image following the mouse, as if the mouse's "grabbing" the piece.
+
 function showStick(clickedPiece) {
     stick.classList.remove('hidden');
     stick.src = pieceImages[clickedPiece];
@@ -348,6 +389,8 @@ function showStick(clickedPiece) {
     //     el.classList.remove('hidden');
     // })
 }
+
+// Temporarily hides the stick element's image (no piece is grabbed).
 
 function hideStick() {
     stick.classList.add('hidden');
@@ -363,6 +406,8 @@ const body = document.querySelector('body')
 const stick = document.querySelector('.stick');
 const shadow = document.querySelector('.shadow');
 
+// Listens for a mouse click on the board. Runs every time a click is detected.
+
 boardElement.addEventListener('click', (event) => {
     const squareElement = event.target.closest('.square');
     if (!squareElement) return;
@@ -373,11 +418,20 @@ boardElement.addEventListener('click', (event) => {
 
     document.body.classList.remove('is-grabbing');
 
+    // If no piece is selected.
+
     if (!selectedSquare) {
+
+        // If the clicked tile isn't empty
+
         if (clickedPiece !== null) {
+
+            // Checks if the clicked piece is of the color of the player's turn.
+            
             if (checkWhite(clickedPiece) !== whiteTurn) {
                 return;
             }
+            
             selectedSquare = {row,col};
 
             squareElement.classList.add('selected');
@@ -391,11 +445,12 @@ boardElement.addEventListener('click', (event) => {
             
             const pieceImg = squareElement.querySelector('.chess-piece');
 
+            // Temporarily hides the grabbed piece from the board; It's shown as the Stick element instead.
+
             if (pieceImg) {
                 pieceImg.classList.add('hidden');
             }
             
-            // squareElement.classList.add('hidden');
         }
 
         return;
@@ -404,12 +459,16 @@ boardElement.addEventListener('click', (event) => {
     const startRow = selectedSquare.row;
     const startCol = selectedSquare.col;
 
+    // Deselect if the same tile is clicked twice.
+
     if (startRow === row && startCol == col) {
         clearSelection();
         squareElement.classList.remove('hidden');
         return;
     }
 
+    // Deselect if another piece is selected (from the same color).
+    
     if (clickedPiece !== null && checkWhite(clickedPiece) == whiteTurn) {
         clearSelection();
         
@@ -425,9 +484,13 @@ boardElement.addEventListener('click', (event) => {
         return;
     }
     
+    // From now on, after all previous conditions and eventual returns, if nothing is returned, then the piece must be placed.
+
     const piece = initialBoard[startRow][startCol];
 
     let isValid = false;
+
+    // Invalid move deselects the piece and no move is made.
 
     isValid = isMoveValidForPiece(startRow,startCol,row,col,piece)
     
@@ -436,9 +499,13 @@ boardElement.addEventListener('click', (event) => {
         return;
     }
 
+    // Temporarily moves the piece to its destination, to look for a check on the player's piece.
+
     const targetPiece = initialBoard[row][col];
     initialBoard[row][col] = piece;
     initialBoard[startRow][startCol] = null;
+
+    // Reverts the move if the king is in check.
 
     const movingPlayerIsWhite = whiteTurn;
     if (isKingInCheck(movingPlayerIsWhite)) {
@@ -449,10 +516,14 @@ boardElement.addEventListener('click', (event) => {
         return;
         
     }
+
+    // After the move is made, clear selection, change whose turn is it, and update the board.
     
     clearSelection();
     updateTurn();
     renderBoard();
+
+    // Look for a checkmate.
 
     const nextPlayerIsWhite = whiteTurn;
     if (isCheckmate(nextPlayerIsWhite)) {
@@ -461,6 +532,8 @@ boardElement.addEventListener('click', (event) => {
     }
 
 })
+
+// Creates a banner declaring the winner.
 
 function checkmate(whiteWinner) {
     try {
@@ -472,12 +545,16 @@ function checkmate(whiteWinner) {
 
 }
 
+// Creates a banner with custom text.
+
 function banner(text) {
     const b = document.createElement('div');
     b.classList.add('banner');
     b.innerHTML = text
     body.appendChild(b);
 }
+
+// Distance to the nearest valid move for the grabbed piece (from the mouse), including the piece's initial tile.
 
 function getNearestValidMove(mouseX,mouseY) {
     const validSquares = document.querySelectorAll('.square.valid-move,.square.attack-move,.selected');
@@ -502,7 +579,14 @@ function getNearestValidMove(mouseX,mouseY) {
     return minDistance;
 }
 
-const computedStyle = getComputedStyle(document.documentElement);
+// I don't remember what this is...
+
+// const computedStyle = getComputedStyle(document.documentElement);
+
+// ***
+
+// Updates the grabbed piece's position (sticks to the mouse), and shadow opacity, blur and offset.
+// Creates a depth effect, where the piece is closer to the board when approaching a valid tile.
 
 function handleCursorMove() {
     try{
@@ -524,6 +608,9 @@ function handleCursorMove() {
         alert(e)
     }
 }
+
+// One-liners that listen for a mouse click or movement. Points to handleCursorMove().
+// Listens for click, to update the piece and shadow immediately when a piece is grabbed, and not wait for the mouse to move.
 
 window.addEventListener('mousemove',handleCursorMove);
 window.addEventListener('click',handleCursorMove);
