@@ -1,5 +1,5 @@
 :root {
-    --board-size: 90vh;
+    --board-size: min(90vw,90vh);
     --tile-size: calc(var(--board-size)/8);
 }
 
@@ -112,4 +112,8 @@ body {
 
 body.is-grabbing, body.is-grabbing * {
     cursor: grabbing !important;
+}
+
+.banner {
+    text-align: center;
 }

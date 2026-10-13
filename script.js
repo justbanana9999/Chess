@@ -462,7 +462,7 @@ boardElement.addEventListener('click', (event) => {
 })
 
 function getNearestValidMove(mouseX,mouseY) {
-    const validSquares = document.querySelectorAll('.square.valid-move,.square.attack-move');
+    const validSquares = document.querySelectorAll('.square.valid-move,.square.attack-move,.selected');
 
     let nearestSquare = null;
     let minDistance = Infinity;
