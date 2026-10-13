@@ -332,7 +332,7 @@ function renderBoard() {
                 img.src = pieceImages[piece];
                 img.alt = piece;
                 img.classList.add('chess-piece');
-                if (img.toUpperCase() == 'R' || img.toUpperCase() == 'K') {
+                if (piece.toUpperCase() == 'R' || piece.toUpperCase() == 'K') {
                     img.classList.add('unmoved');
                 }
                 square.appendChild(img);
