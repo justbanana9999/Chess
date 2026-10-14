@@ -127,6 +127,20 @@ function isValidKingMove(startRow,startCol,targetRow,targetCol) {
     const rowDiff = targetRow-startRow;
     const colDiff = targetCol-startCol;
 
+    if (checkWhite(piece)) {
+
+        const right = checkStep(startRow,startCol,7,7)
+        const left = checkStep(startRow,startCol,7,0)
+
+    } else {
+
+        const right = checkStep(startRow,startCol,0,7)
+        const left = checkStep(startRow,startCol,0,0)
+
+    }
+
+
+
     if (Math.abs(rowDiff) > 1 || Math.abs(colDiff) > 1) {
         return false;
     }
@@ -150,7 +164,7 @@ function sameColor(piece,targetPiece) {
     return isWhite === isTargetWhite;
 }
 
-// Moves a piece to a destination tile, tile by tile, and returns false if there are any pieces between. Used by the rook, bishop and queen.
+// Moves a piece to a destination tile, tile by tile, and returns false if there are any pieces before arriving. Used by the rook, bishop and queen.
 
 function checkStep(startRow,startCol,targetRow,targetCol) {
     const rowStep = startRow === targetRow ? 0 : (targetRow>startRow ? 1 : -1);
